@@ -238,6 +238,29 @@ require('lazy').setup({
   -- Use `opts = {}` to force a plugin to be loaded.
   --
 
+  -- BEGIN CUSTOM PLUGINS ! --
+  {
+    'sourcegraph/sg.nvim',
+    dependencies = {
+      'nvim-lua/plenary.nvim', --[[ "nvim-telescope/telescope.nvim ]]
+    },
+  },
+
+  { -- visualising da files !
+    'nvim-tree/nvim-tree.lua', -- The main plugin
+    dependencies = { 'nvim-tree/nvim-web-devicons' }, -- Optional, for file icons
+    config = function()
+      -- Setup and configure nvim-tree
+      require('nvim-tree').setup {}
+
+      -- Leader - e (the goat) :D
+      vim.keymap.set('n', '<leader>e', function()
+        require('nvim-tree.api').tree.toggle()
+      end, { desc = 'Toggle nvim-tree' })
+    end,
+  },
+  -- FINISH CUSTOM PLUGINS !! --
+
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
   --    require('gitsigns').setup({ ... })
