@@ -266,6 +266,7 @@ require('lazy').setup({
     config = function()
       require('chatgpt').setup {
         -- this config assumes you have OPENAI_API_KEY environment variable set
+
         openai_params = {
           -- NOTE: model can be a function returning the model name
           -- this is useful if you want to change the model on the fly
@@ -286,6 +287,18 @@ require('lazy').setup({
           top_p = 0.1,
           n = 1,
         },
+
+        openai_edit_params = {
+          model = 'gpt-4o-mini-2024-07-18',
+          frequency_penalty = 0,
+          presence_penalty = 0,
+          temperature = 0.2,
+          top_p = 1,
+          n = 1,
+        },
+
+        popup_window = { border = { text = { top = ' CodeEdit ' } } },
+        actions_paths = { '/Users/zsaber/.config/nvim/lua/custom/plugins/chatgpt/actions.json' },
       }
     end,
     dependencies = {
@@ -345,6 +358,8 @@ require('lazy').setup({
         ['<leader>w'] = { name = '[W]orkspace' },
         ['<leader>t'] = { name = '[T]oggle' },
         ['<leader>h'] = { name = 'Git [H]unk', mode = { 'n', 'v' } },
+
+        ['<leader>k'] = { name = 'GPT Adjust', '<cmd>ChatGPTRun quickedit<CR>', 'Adjust based on comment', mode = { 'n', 'v' } },
         ['<leader>c'] = {
           name = 'ChatGPT',
           c = { '<cmd>ChatGPT<CR>', 'ChatGPT' },
@@ -360,6 +375,7 @@ require('lazy').setup({
           x = { '<cmd>ChatGPTRun explain_code<CR>', 'Explain Code', mode = { 'n', 'v' } },
           r = { '<cmd>ChatGPTRun roxygen_edit<CR>', 'Roxygen Edit', mode = { 'n', 'v' } },
           l = { '<cmd>ChatGPTRun code_readability_analysis<CR>', 'Code Readability Analysis', mode = { 'n', 'v' } },
+          q = { '<cmd>ChatGPTRun quickedit<CR>', 'Adjust based on comment', mode = { 'n', 'v' } },
         },
       }
     end,

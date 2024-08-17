@@ -1,0 +1,15 @@
+{
+  "quickedit": {
+    "type": "chat",
+    "opts": {
+      "template": "Rewrite the following code, based on the comment at the bottom.\n\nCode:\n```{{filetype}}\n{{input}}\n```\n\nAdjusted version:\n```{{filetype}}",
+      "strategy": "edit",
+      "params": {
+        "model": "gpt-4o-mini-2024-07-18",
+        "stop": [
+          "```"
+        ]
+      }
+    }
+  }
+}
