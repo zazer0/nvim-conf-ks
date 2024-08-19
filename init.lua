@@ -359,6 +359,22 @@ require('lazy').setup({
         ['<leader>t'] = { name = '[T]oggle' },
         ['<leader>h'] = { name = 'Git [H]unk', mode = { 'n', 'v' } },
 
+        -- CUSTOM COMMENT API BIND! -- TODO: install the actual plugin lol
+        ['<leader>/'] = {
+          {
+            name = 'Comment',
+            "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>",
+            'Toggle comment',
+          },
+          mode = 'n',
+          {
+            "<esc><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>",
+            'Toggle comment',
+            mode = 'v',
+          },
+        },
+        -- CUSTOM COMMENT API BIND!
+
         ['<leader>k'] = { name = 'GPT Adjust', '<cmd>ChatGPTRun quickedit<CR>', 'Adjust based on comment', mode = { 'n', 'v' } },
         ['<leader>c'] = {
           name = 'ChatGPT',
@@ -469,7 +485,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
-      vim.keymap.set('n', '<leader>/', function()
+      vim.keymap.set('n', '<leader>f', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
         builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
           winblend = 10,
@@ -726,12 +742,12 @@ require('lazy').setup({
     cmd = { 'ConformInfo' },
     keys = {
       {
-        '<leader>f',
+        '<leader>=',
         function()
           require('conform').format { async = true, lsp_fallback = true }
         end,
         mode = '',
-        desc = '[F]ormat buffer',
+        desc = '[=] Format buffer',
       },
     },
     opts = {
