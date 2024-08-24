@@ -253,7 +253,15 @@ require('lazy').setup {
   { -- hopefully this is painless :pray:
     'pmizio/typescript-tools.nvim',
     dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-    opts = {},
+    opts = {
+      tsserver_format_options = {
+        allowIncompleteCompletions = false,
+        baseIndentSize = 3,
+        indentSize = 3,
+        tabSize = 3,
+        convertTabsToSpaces = true,
+      },
+    },
   },
 
   { -- todo highlighting (the goat)
