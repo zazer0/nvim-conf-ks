@@ -249,7 +249,7 @@ require('lazy').setup {
   --
 
   -- BEGIN CUSTOM PLUGINS ! --
-
+  --
   { -- hopefully this is painless :pray:
     'pmizio/typescript-tools.nvim',
     dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
