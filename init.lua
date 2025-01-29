@@ -236,6 +236,7 @@ vim.opt.rtp:prepend(lazypath)
 --  To update plugins you can run
 --    :Lazy update
 --
+local root_home_dir = vim.fn.expand '$HOME'
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup {
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
@@ -365,7 +366,7 @@ require('lazy').setup {
           },
 
           popup_window = { border = { text = { top = ' CodeEdit ' } } },
-          actions_paths = { '/Users/zsaber/.config/nvim/lua/custom/plugins/chatgpt/actions.json' },
+          actions_paths = { root_home_dir .. '/.config/nvim/lua/custom/plugins/chatgpt/actions.json' },
         }
       end,
       dependencies = {
