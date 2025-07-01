@@ -238,6 +238,37 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup {
+
+  {
+    'anasinnyk/nvim-k8s-crd',
+    event = { 'BufReadPre', 'BufNewFile' }, -- or { 'BufEnter *.yaml' },
+    dependencies = { 'neovim/nvim-lspconfig' },
+    opts = {
+      cache_dir = '~/.cache/k8s-schemas/',
+      k8s = {
+        file_mask = '*.yaml',
+      },
+    },
+  },
+
+  {
+    'diogo464/kubernetes.nvim',
+    event = { 'BufReadPre *.yaml', 'BufReadPre *.yml' }, -- Load only when opening YAML files
+    opts = {
+      -- this can help with autocomplete. it sets the `additionalProperties` field on type definitions to false if it is not already present.
+      schema_strict = true,
+      -- true:  generate the schema every time the plugin starts
+      -- false: only generate the schema if the files don't already exists. run `:KubernetesGenerateSchema` manually to generate the schema if needed.
+      schema_generate_always = false, -- Changed to false to prevent automatic generation
+      -- Patch yaml-language-server's validation.js file.
+      patch = true,
+      -- root path of the yamlls language server. by default it is assumed you are using mason but if not this option allows changing that path.
+      yamlls_root = function()
+        return vim.fs.joinpath(vim.fn.stdpath 'data', '/mason/packages/yaml-language-server/')
+      end,
+    },
+  },
+
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
@@ -754,6 +785,15 @@ require('lazy').setup {
                 -- diagnostics = { disable = { 'missing-fields' } },
               },
             },
+          },
+          yamlls = {
+            settings = {
+              yaml = {
+                schemas = {
+                  [require('kubernetes').yamlls_schema()] = "*.yaml",
+                }
+              }
+            }
           },
         }
 
