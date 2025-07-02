@@ -241,12 +241,13 @@ require('lazy').setup {
 
   {
     'anasinnyk/nvim-k8s-crd',
-    event = { 'BufReadPre', 'BufNewFile' }, -- or { 'BufEnter *.yaml' },
+    lazy = true, -- Don't load until explicitly needed
+    cmd = { 'K8SSchemasGenerate' }, -- Only load when using the command
     dependencies = { 'neovim/nvim-lspconfig' },
     opts = {
       cache_dir = '~/.cache/k8s-schemas/',
       k8s = {
-        file_mask = '*.yaml',
+        file_mask = nil, -- Disable automatic schema fetching
       },
     },
   },
