@@ -214,6 +214,14 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- Have proper syntax highlighting for envs
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+  pattern = '*.env*',
+  callback = function()
+    vim.bo.filetype = 'sh'
+  end,
+})
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -236,6 +244,7 @@ vim.opt.rtp:prepend(lazypath)
 --  To update plugins you can run
 --    :Lazy update
 --
+local root_home_dir = vim.fn.expand '$HOME'
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup {
 
@@ -397,7 +406,7 @@ require('lazy').setup {
           },
 
           popup_window = { border = { text = { top = ' CodeEdit ' } } },
-          actions_paths = { '/Users/zsaber/.config/nvim/lua/custom/plugins/chatgpt/actions.json' },
+          actions_paths = { root_home_dir .. '/.config/nvim/lua/custom/plugins/chatgpt/actions.json' },
         }
       end,
       dependencies = {
