@@ -797,11 +797,22 @@ require('lazy').setup {
             },
           },
           yamlls = {
+            on_new_config = function(config, root_dir)
+              config.settings = vim.tbl_deep_extend('force', config.settings or {}, {
+                yaml = {
+                  schemas = config.settings and config.settings.yaml and config.settings.yaml.schemas or {}
+                }
+              })
+              
+              -- Safely add kubernetes schema if plugin is available
+              local ok, kubernetes = pcall(require, 'kubernetes')
+              if ok and kubernetes.yamlls_schema then
+                config.settings.yaml.schemas[kubernetes.yamlls_schema()] = "*.yaml"
+              end
+            end,
             settings = {
               yaml = {
-                schemas = {
-                  [require('kubernetes').yamlls_schema()] = "*.yaml",
-                }
+                schemas = {}  -- Start with empty, populated dynamically
               }
             }
           },
