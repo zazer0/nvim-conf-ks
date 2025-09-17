@@ -248,6 +248,144 @@ local root_home_dir = vim.fn.expand '$HOME'
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup {
 
+  -- XXX: BEGIN LANG PLUGINS !
+
+  -- INFO: rust / 6991 !
+  {
+    'mrcjkb/rustaceanvim',
+    version = '^6', -- Recommended
+    lazy = false, -- This plugin is already lazy
+  },
+
+  -- INFO: Debug Adapter Protocol (DAP) for debugging support
+  {
+    'mfussenegger/nvim-dap',
+    lazy = true,
+    dependencies = {
+      -- Creates a beautiful debugger UI
+      {
+        'rcarriga/nvim-dap-ui',
+        dependencies = { 'nvim-neotest/nvim-nio' },
+        config = function()
+          local dap = require 'dap'
+          local dapui = require 'dapui'
+
+          -- Setup dap-ui with sensible defaults
+          dapui.setup {
+            icons = { expanded = '▾', collapsed = '▸', current_frame = '▸' },
+            mappings = {
+              -- Use default mappings
+              expand = { '<CR>', '<2-LeftMouse>' },
+              open = 'o',
+              remove = 'd',
+              edit = 'e',
+              repl = 'r',
+              toggle = 't',
+            },
+            layouts = {
+              {
+                elements = {
+                  { id = 'scopes', size = 0.25 },
+                  { id = 'breakpoints', size = 0.25 },
+                  { id = 'stacks', size = 0.25 },
+                  { id = 'watches', size = 0.25 },
+                },
+                size = 40,
+                position = 'left',
+              },
+              {
+                elements = {
+                  { id = 'repl', size = 0.5 },
+                  { id = 'console', size = 0.5 },
+                },
+                size = 10,
+                position = 'bottom',
+              },
+            },
+          }
+
+          -- Automatically open/close dap-ui when debugging starts/ends
+          dap.listeners.after.event_initialized['dapui_config'] = function()
+            dapui.open()
+          end
+          dap.listeners.before.event_terminated['dapui_config'] = function()
+            dapui.close()
+          end
+          dap.listeners.before.event_exited['dapui_config'] = function()
+            dapui.close()
+          end
+        end,
+      },
+
+      -- Virtual text for debugging (shows variable values inline)
+      {
+        'theHamsta/nvim-dap-virtual-text',
+        config = function()
+          require('nvim-dap-virtual-text').setup {
+            enabled = true,
+            enabled_commands = true,
+            highlight_changed_variables = true,
+            highlight_new_as_changed = false,
+            show_stop_reason = true,
+            commented = false,
+            only_first_definition = true,
+            all_references = false,
+            filter_references_pattern = '<module',
+          }
+        end,
+      },
+    },
+    config = function()
+      local dap = require 'dap'
+
+      -- Configure CodeLLDB adapter for Rust
+      dap.adapters.codelldb = {
+        type = 'server',
+        port = '${port}',
+        executable = {
+          command = vim.fn.stdpath('data') .. '/mason/bin/codelldb',
+          args = { '--port', '${port}' },
+        }
+      }
+
+      -- Set up debugging keybindings
+      vim.keymap.set('n', '<F5>', function() require('dap').continue() end, { desc = 'Debug: Start/Continue' })
+      vim.keymap.set('n', '<F10>', function() require('dap').step_over() end, { desc = 'Debug: Step Over' })
+      vim.keymap.set('n', '<F11>', function() require('dap').step_into() end, { desc = 'Debug: Step Into' })
+      vim.keymap.set('n', '<F12>', function() require('dap').step_out() end, { desc = 'Debug: Step Out' })
+      vim.keymap.set('n', '<leader>b', function() require('dap').toggle_breakpoint() end, { desc = 'Debug: Toggle Breakpoint' })
+      vim.keymap.set('n', '<leader>B', function() require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, { desc = 'Debug: Set Conditional Breakpoint' })
+      vim.keymap.set('n', '<leader>lp', function() require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: ')) end, { desc = 'Debug: Set Log Point' })
+      vim.keymap.set('n', '<leader>dr', function() require('dap').repl.open() end, { desc = 'Debug: Open REPL' })
+      vim.keymap.set('n', '<leader>dl', function() require('dap').run_last() end, { desc = 'Debug: Run Last' })
+
+      -- DAP UI keybindings
+      vim.keymap.set('n', '<leader>du', function() require('dapui').toggle() end, { desc = 'Debug: Toggle UI' })
+      vim.keymap.set('n', '<leader>de', function() require('dapui').eval() end, { desc = 'Debug: Evaluate Expression' })
+      vim.keymap.set('v', '<leader>de', function() require('dapui').eval() end, { desc = 'Debug: Evaluate Expression' })
+
+      -- Hover actions for debugging
+      vim.keymap.set({'n', 'v'}, '<leader>dh', function()
+        require('dap.ui.widgets').hover()
+      end, { desc = 'Debug: Hover Variables' })
+
+      vim.keymap.set({'n', 'v'}, '<leader>dp', function()
+        require('dap.ui.widgets').preview()
+      end, { desc = 'Debug: Preview' })
+
+      vim.keymap.set('n', '<leader>df', function()
+        local widgets = require('dap.ui.widgets')
+        widgets.centered_float(widgets.frames)
+      end, { desc = 'Debug: Show Frames' })
+
+      vim.keymap.set('n', '<leader>ds', function()
+        local widgets = require('dap.ui.widgets')
+        widgets.centered_float(widgets.scopes)
+      end, { desc = 'Debug: Show Scopes' })
+    end,
+  },
+
+  -- INFO: kubernetes !
   {
     'anasinnyk/nvim-k8s-crd',
     lazy = true, -- Don't load until explicitly needed
@@ -278,6 +416,8 @@ require('lazy').setup {
       end,
     },
   },
+
+  -- XXX: -> END LANG PLUGINS!
 
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
@@ -800,21 +940,21 @@ require('lazy').setup {
             on_new_config = function(config, root_dir)
               config.settings = vim.tbl_deep_extend('force', config.settings or {}, {
                 yaml = {
-                  schemas = config.settings and config.settings.yaml and config.settings.yaml.schemas or {}
-                }
+                  schemas = config.settings and config.settings.yaml and config.settings.yaml.schemas or {},
+                },
               })
-              
+
               -- Safely add kubernetes schema if plugin is available
               local ok, kubernetes = pcall(require, 'kubernetes')
               if ok and kubernetes.yamlls_schema then
-                config.settings.yaml.schemas[kubernetes.yamlls_schema()] = "*.yaml"
+                config.settings.yaml.schemas[kubernetes.yamlls_schema()] = '*.yaml'
               end
             end,
             settings = {
               yaml = {
-                schemas = {}  -- Start with empty, populated dynamically
-              }
-            }
+                schemas = {}, -- Start with empty, populated dynamically
+              },
+            },
           },
         }
 
