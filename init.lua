@@ -250,11 +250,115 @@ require('lazy').setup {
 
   -- XXX: BEGIN LANG PLUGINS !
 
-  -- INFO: rust / 6991 !
+  -- INFO: rust / rustaceanvim with DAP integration
   {
     'mrcjkb/rustaceanvim',
-    version = '^6', -- Recommended
-    lazy = false, -- This plugin is already lazy
+    version = '^6',
+    lazy = false,
+    dependencies = {
+      'mfussenegger/nvim-dap',
+    },
+    config = function()
+      -- Configure rustaceanvim with DAP support
+      vim.g.rustaceanvim = {
+        -- Plugin configuration
+        tools = {
+          -- Configure hover actions
+          hover_actions = {
+            auto_focus = false,
+          },
+          -- Configure code actions
+          code_actions = {
+            ui_select_fallback = true,
+          },
+        },
+        -- LSP configuration
+        server = {
+          -- Use Mason's rust-analyzer
+          cmd = { vim.fn.stdpath('data') .. '/mason/bin/rust-analyzer' },
+          -- Configure rust-analyzer settings
+          default_settings = {
+            ['rust-analyzer'] = {
+              cargo = {
+                allFeatures = true,
+                loadOutDirsFromCheck = true,
+                runBuildScripts = true,
+              },
+              checkOnSave = {
+                allFeatures = true,
+                command = 'clippy',
+              },
+              procMacro = {
+                enable = true,
+                ignored = {
+                  ['async-trait'] = { 'async_trait' },
+                  ['napi-derive'] = { 'napi' },
+                  ['async-recursion'] = { 'async_recursion' },
+                },
+              },
+              inlayHints = {
+                bindingModeHints = {
+                  enable = false,
+                },
+                chainingHints = {
+                  enable = true,
+                },
+                closingBraceHints = {
+                  enable = true,
+                  minLines = 25,
+                },
+                closureReturnTypeHints = {
+                  enable = 'never',
+                },
+                lifetimeElisionHints = {
+                  enable = 'never',
+                  useParameterNames = false,
+                },
+                maxLength = 25,
+                parameterHints = {
+                  enable = true,
+                },
+                reborrowHints = {
+                  enable = 'never',
+                },
+                renderColons = true,
+                typeHints = {
+                  enable = true,
+                  hideClosureInitialization = false,
+                  hideNamedConstructor = false,
+                },
+              },
+            },
+          },
+          on_attach = function(client, bufnr)
+            -- Set up Rust-specific keybindings
+            vim.keymap.set('n', '<leader>ra', function() vim.cmd.RustLsp('codeAction') end, { buffer = bufnr, desc = 'Rust: Code Action' })
+            vim.keymap.set('n', '<leader>rd', function() vim.cmd.RustLsp('debuggables') end, { buffer = bufnr, desc = 'Rust: Debug' })
+            vim.keymap.set('n', '<leader>rr', function() vim.cmd.RustLsp('runnables') end, { buffer = bufnr, desc = 'Rust: Run' })
+            vim.keymap.set('n', '<leader>rt', function() vim.cmd.RustLsp('testables') end, { buffer = bufnr, desc = 'Rust: Test' })
+            vim.keymap.set('n', '<leader>re', function() vim.cmd.RustLsp('expandMacro') end, { buffer = bufnr, desc = 'Rust: Expand Macro' })
+            vim.keymap.set('n', '<leader>rc', function() vim.cmd.RustLsp('openCargo') end, { buffer = bufnr, desc = 'Rust: Open Cargo.toml' })
+            vim.keymap.set('n', '<leader>rp', function() vim.cmd.RustLsp('parentModule') end, { buffer = bufnr, desc = 'Rust: Parent Module' })
+            vim.keymap.set('n', '<leader>rj', function() vim.cmd.RustLsp('joinLines') end, { buffer = bufnr, desc = 'Rust: Join Lines' })
+            vim.keymap.set('n', '<leader>ru', function() vim.cmd.RustLsp { 'moveItem', 'up' } end, { buffer = bufnr, desc = 'Rust: Move Item Up' })
+            vim.keymap.set('n', '<leader>rm', function() vim.cmd.RustLsp { 'moveItem', 'down' } end, { buffer = bufnr, desc = 'Rust: Move Item Down' })
+            vim.keymap.set('n', '<leader>rh', function() vim.cmd.RustLsp { 'hover', 'actions' } end, { buffer = bufnr, desc = 'Rust: Hover Actions' })
+            vim.keymap.set('n', '<leader>rx', function() vim.cmd.RustLsp('explainError') end, { buffer = bufnr, desc = 'Rust: Explain Error' })
+            vim.keymap.set('n', '<leader>ro', function() vim.cmd.RustLsp('openDocs') end, { buffer = bufnr, desc = 'Rust: Open Docs' })
+            vim.keymap.set('n', '<leader>rw', function() vim.cmd.RustLsp { 'workspaceSymbol' } end, { buffer = bufnr, desc = 'Rust: Workspace Symbol' })
+          end,
+        },
+        -- DAP configuration
+        dap = {
+          adapter = function()
+            return require('rustaceanvim.config').get_codelldb_adapter(
+              vim.fn.stdpath('data') .. '/mason/packages/codelldb/extension/adapter/codelldb',
+              vim.fn.stdpath('data') .. '/mason/packages/codelldb/extension/lldb/lib/liblldb.dylib'
+            )
+          end,
+        },
+      }
+    end,
   },
 
   -- INFO: Debug Adapter Protocol (DAP) for debugging support
