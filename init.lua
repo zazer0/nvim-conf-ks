@@ -275,7 +275,7 @@ require('lazy').setup {
         -- LSP configuration
         server = {
           -- Use Mason's rust-analyzer
-          cmd = { vim.fn.stdpath('data') .. '/mason/bin/rust-analyzer' },
+          cmd = { vim.fn.stdpath 'data' .. '/mason/bin/rust-analyzer' },
           -- Configure rust-analyzer settings
           default_settings = {
             ['rust-analyzer'] = {
@@ -284,10 +284,7 @@ require('lazy').setup {
                 loadOutDirsFromCheck = true,
                 runBuildScripts = true,
               },
-              checkOnSave = {
-                allFeatures = true,
-                command = 'clippy',
-              },
+              checkOnSave = true,
               procMacro = {
                 enable = true,
                 ignored = {
@@ -323,7 +320,6 @@ require('lazy').setup {
                 },
                 renderColons = true,
                 typeHints = {
-                  enable = true,
                   hideClosureInitialization = false,
                   hideNamedConstructor = false,
                 },
@@ -332,28 +328,56 @@ require('lazy').setup {
           },
           on_attach = function(client, bufnr)
             -- Set up Rust-specific keybindings
-            vim.keymap.set('n', '<leader>ra', function() vim.cmd.RustLsp('codeAction') end, { buffer = bufnr, desc = 'Rust: Code Action' })
-            vim.keymap.set('n', '<leader>rd', function() vim.cmd.RustLsp('debuggables') end, { buffer = bufnr, desc = 'Rust: Debug' })
-            vim.keymap.set('n', '<leader>rr', function() vim.cmd.RustLsp('runnables') end, { buffer = bufnr, desc = 'Rust: Run' })
-            vim.keymap.set('n', '<leader>rt', function() vim.cmd.RustLsp('testables') end, { buffer = bufnr, desc = 'Rust: Test' })
-            vim.keymap.set('n', '<leader>re', function() vim.cmd.RustLsp('expandMacro') end, { buffer = bufnr, desc = 'Rust: Expand Macro' })
-            vim.keymap.set('n', '<leader>rc', function() vim.cmd.RustLsp('openCargo') end, { buffer = bufnr, desc = 'Rust: Open Cargo.toml' })
-            vim.keymap.set('n', '<leader>rp', function() vim.cmd.RustLsp('parentModule') end, { buffer = bufnr, desc = 'Rust: Parent Module' })
-            vim.keymap.set('n', '<leader>rj', function() vim.cmd.RustLsp('joinLines') end, { buffer = bufnr, desc = 'Rust: Join Lines' })
-            vim.keymap.set('n', '<leader>ru', function() vim.cmd.RustLsp { 'moveItem', 'up' } end, { buffer = bufnr, desc = 'Rust: Move Item Up' })
-            vim.keymap.set('n', '<leader>rm', function() vim.cmd.RustLsp { 'moveItem', 'down' } end, { buffer = bufnr, desc = 'Rust: Move Item Down' })
-            vim.keymap.set('n', '<leader>rh', function() vim.cmd.RustLsp { 'hover', 'actions' } end, { buffer = bufnr, desc = 'Rust: Hover Actions' })
-            vim.keymap.set('n', '<leader>rx', function() vim.cmd.RustLsp('explainError') end, { buffer = bufnr, desc = 'Rust: Explain Error' })
-            vim.keymap.set('n', '<leader>ro', function() vim.cmd.RustLsp('openDocs') end, { buffer = bufnr, desc = 'Rust: Open Docs' })
-            vim.keymap.set('n', '<leader>rw', function() vim.cmd.RustLsp { 'workspaceSymbol' } end, { buffer = bufnr, desc = 'Rust: Workspace Symbol' })
+            vim.keymap.set('n', '<leader>ra', function()
+              vim.cmd.RustLsp 'codeAction'
+            end, { buffer = bufnr, desc = 'Rust: Code Action' })
+            vim.keymap.set('n', '<leader>rd', function()
+              vim.cmd.RustLsp 'debuggables'
+            end, { buffer = bufnr, desc = 'Rust: Debug' })
+            vim.keymap.set('n', '<leader>rr', function()
+              vim.cmd.RustLsp 'runnables'
+            end, { buffer = bufnr, desc = 'Rust: Run' })
+            vim.keymap.set('n', '<leader>rt', function()
+              vim.cmd.RustLsp 'testables'
+            end, { buffer = bufnr, desc = 'Rust: Test' })
+            vim.keymap.set('n', '<leader>re', function()
+              vim.cmd.RustLsp 'expandMacro'
+            end, { buffer = bufnr, desc = 'Rust: Expand Macro' })
+            vim.keymap.set('n', '<leader>rc', function()
+              vim.cmd.RustLsp 'openCargo'
+            end, { buffer = bufnr, desc = 'Rust: Open Cargo.toml' })
+            vim.keymap.set('n', '<leader>rp', function()
+              vim.cmd.RustLsp 'parentModule'
+            end, { buffer = bufnr, desc = 'Rust: Parent Module' })
+            vim.keymap.set('n', '<leader>rj', function()
+              vim.cmd.RustLsp 'joinLines'
+            end, { buffer = bufnr, desc = 'Rust: Join Lines' })
+            vim.keymap.set('n', '<leader>ru', function()
+              vim.cmd.RustLsp { 'moveItem', 'up' }
+            end, { buffer = bufnr, desc = 'Rust: Move Item Up' })
+            vim.keymap.set('n', '<leader>rm', function()
+              vim.cmd.RustLsp { 'moveItem', 'down' }
+            end, { buffer = bufnr, desc = 'Rust: Move Item Down' })
+            vim.keymap.set('n', '<leader>rh', function()
+              vim.cmd.RustLsp { 'hover', 'actions' }
+            end, { buffer = bufnr, desc = 'Rust: Hover Actions' })
+            vim.keymap.set('n', '<leader>rx', function()
+              vim.cmd.RustLsp 'explainError'
+            end, { buffer = bufnr, desc = 'Rust: Explain Error' })
+            vim.keymap.set('n', '<leader>ro', function()
+              vim.cmd.RustLsp 'openDocs'
+            end, { buffer = bufnr, desc = 'Rust: Open Docs' })
+            vim.keymap.set('n', '<leader>rw', function()
+              vim.cmd.RustLsp { 'workspaceSymbol' }
+            end, { buffer = bufnr, desc = 'Rust: Workspace Symbol' })
           end,
         },
         -- DAP configuration
         dap = {
           adapter = function()
             return require('rustaceanvim.config').get_codelldb_adapter(
-              vim.fn.stdpath('data') .. '/mason/packages/codelldb/extension/adapter/codelldb',
-              vim.fn.stdpath('data') .. '/mason/packages/codelldb/extension/lldb/lib/liblldb.dylib'
+              vim.fn.stdpath 'data' .. '/mason/packages/codelldb/extension/adapter/codelldb',
+              vim.fn.stdpath 'data' .. '/mason/packages/codelldb/extension/lldb/lib/liblldb.dylib'
             )
           end,
         },
@@ -447,43 +471,67 @@ require('lazy').setup {
         type = 'server',
         port = '${port}',
         executable = {
-          command = vim.fn.stdpath('data') .. '/mason/bin/codelldb',
+          command = vim.fn.stdpath 'data' .. '/mason/bin/codelldb',
           args = { '--port', '${port}' },
-        }
+        },
       }
 
       -- Set up debugging keybindings
-      vim.keymap.set('n', '<F5>', function() require('dap').continue() end, { desc = 'Debug: Start/Continue' })
-      vim.keymap.set('n', '<F10>', function() require('dap').step_over() end, { desc = 'Debug: Step Over' })
-      vim.keymap.set('n', '<F11>', function() require('dap').step_into() end, { desc = 'Debug: Step Into' })
-      vim.keymap.set('n', '<F12>', function() require('dap').step_out() end, { desc = 'Debug: Step Out' })
-      vim.keymap.set('n', '<leader>b', function() require('dap').toggle_breakpoint() end, { desc = 'Debug: Toggle Breakpoint' })
-      vim.keymap.set('n', '<leader>B', function() require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, { desc = 'Debug: Set Conditional Breakpoint' })
-      vim.keymap.set('n', '<leader>lp', function() require('dap').set_breakpoint(nil, nil, vim.fn.input('Log point message: ')) end, { desc = 'Debug: Set Log Point' })
-      vim.keymap.set('n', '<leader>dr', function() require('dap').repl.open() end, { desc = 'Debug: Open REPL' })
-      vim.keymap.set('n', '<leader>dl', function() require('dap').run_last() end, { desc = 'Debug: Run Last' })
+      vim.keymap.set('n', '<F5>', function()
+        require('dap').continue()
+      end, { desc = 'Debug: Start/Continue' })
+      vim.keymap.set('n', '<F10>', function()
+        require('dap').step_over()
+      end, { desc = 'Debug: Step Over' })
+      vim.keymap.set('n', '<F11>', function()
+        require('dap').step_into()
+      end, { desc = 'Debug: Step Into' })
+      vim.keymap.set('n', '<F12>', function()
+        require('dap').step_out()
+      end, { desc = 'Debug: Step Out' })
+      vim.keymap.set('n', '<leader>b', function()
+        require('dap').toggle_breakpoint()
+      end, { desc = 'Debug: Toggle Breakpoint' })
+      vim.keymap.set('n', '<leader>B', function()
+        require('dap').set_breakpoint(vim.fn.input 'Breakpoint condition: ')
+      end, { desc = 'Debug: Set Conditional Breakpoint' })
+      vim.keymap.set('n', '<leader>lp', function()
+        require('dap').set_breakpoint(nil, nil, vim.fn.input 'Log point message: ')
+      end, { desc = 'Debug: Set Log Point' })
+      vim.keymap.set('n', '<leader>dr', function()
+        require('dap').repl.open()
+      end, { desc = 'Debug: Open REPL' })
+      vim.keymap.set('n', '<leader>dl', function()
+        require('dap').run_last()
+      end, { desc = 'Debug: Run Last' })
 
       -- DAP UI keybindings
-      vim.keymap.set('n', '<leader>du', function() require('dapui').toggle() end, { desc = 'Debug: Toggle UI' })
-      vim.keymap.set('n', '<leader>de', function() require('dapui').eval() end, { desc = 'Debug: Evaluate Expression' })
-      vim.keymap.set('v', '<leader>de', function() require('dapui').eval() end, { desc = 'Debug: Evaluate Expression' })
+      vim.keymap.set('n', '<leader>du', function()
+        require('dapui').toggle()
+      end, { desc = 'Debug: Toggle UI' })
+      vim.keymap.set('n', '<leader>de', function()
+        require('dapui').eval()
+      end, { desc = 'Debug: Evaluate Expression' })
+      vim.keymap.set('v', '<leader>de', function()
+        require('dapui').eval()
+      end, { desc = 'Debug: Evaluate Expression' })
 
       -- Hover actions for debugging
-      vim.keymap.set({'n', 'v'}, '<leader>dh', function()
+      vim.keymap.set({ 'n', 'v' }, '<leader>dh', function()
         require('dap.ui.widgets').hover()
       end, { desc = 'Debug: Hover Variables' })
 
-      vim.keymap.set({'n', 'v'}, '<leader>dp', function()
+      vim.keymap.set({ 'n', 'v' }, '<leader>dp', function()
         require('dap.ui.widgets').preview()
       end, { desc = 'Debug: Preview' })
 
       vim.keymap.set('n', '<leader>df', function()
-        local widgets = require('dap.ui.widgets')
+        local widgets = require 'dap.ui.widgets'
         widgets.centered_float(widgets.frames)
       end, { desc = 'Debug: Show Frames' })
 
       vim.keymap.set('n', '<leader>ds', function()
-        local widgets = require('dap.ui.widgets')
+        local widgets = require 'dap.ui.widgets'
         widgets.centered_float(widgets.scopes)
       end, { desc = 'Debug: Show Scopes' })
     end,
