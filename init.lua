@@ -227,10 +227,39 @@ vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
-  local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
-  if vim.v.shell_error ~= 0 then
-    error('Error cloning lazy.nvim:\n' .. out)
+
+  -- Pre-flight check: verify git is available
+  if vim.fn.executable 'git' ~= 1 then
+    error('lazy.nvim bootstrap requires git to be installed and available in PATH')
   end
+
+  -- Create parent directory if it doesn't exist
+  local parent_dir = vim.fn.fnamemodify(lazypath, ':h')
+  if vim.fn.isdirectory(parent_dir) == 0 then
+    local mkdir_result = vim.fn.mkdir(parent_dir, 'p')
+    if mkdir_result ~= 1 then
+      error(string.format('Failed to create directory: %s', parent_dir))
+    end
+  end
+
+  vim.notify('Bootstrapping lazy.nvim plugin manager...', vim.log.levels.INFO)
+
+  local clone_command = { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
+  local out = vim.fn.system(clone_command)
+
+  if vim.v.shell_error ~= 0 then
+    error(string.format('Failed to clone lazy.nvim from %s\n\nCommand: %s\n\nOutput:\n%s',
+      lazyrepo,
+      table.concat(clone_command, ' '),
+      out))
+  end
+
+  -- Post-clone verification
+  if vim.fn.isdirectory(lazypath) == 0 then
+    error(string.format('Clone appeared to succeed but directory does not exist: %s', lazypath))
+  end
+
+  vim.notify('lazy.nvim installed successfully!', vim.log.levels.INFO)
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
