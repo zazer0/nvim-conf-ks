@@ -414,6 +414,9 @@ require('lazy').setup {
     end,
   },
 
+  -- INFO: RON (Rusty Object Notation) syntax highlighting
+  'ron-rs/ron.vim',
+
   -- INFO: Debug Adapter Protocol (DAP) for debugging support
   {
     'mfussenegger/nvim-dap',
